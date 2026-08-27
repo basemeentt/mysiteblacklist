@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blacklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    @font-face {
+    font-family: 'NfS MW';
+    src: url('assets/Mostwasted.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    }
+
+    :root {
+    --bg: #0b0c0e;
+    --text: #ecedf0;
+    --text-muted: #83878e;
+    --accent: #73e0fb;
+    --accent-warm: #ff3b30;
+    --font-display: 'NfS MW', 'Bebas Neue', sans-serif; /* Добавили NfS MW в главные */
+    --font-label: 'NfS MW', 'Oswald', sans-serif;       /* Заменили и для меток/имён */
+    --font-body: 'Inter', sans-serif;
+    --font-nfs: 'NfS MW', var(--font-display);
+    --ease: cubic-bezier(.76,0,.24,1);
+    }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; background:var(--bg); overflow:hidden; }
+body{ font-family: var(--font-body); color:var(--text); -webkit-font-smoothing:antialiased; }
+
+/* ФОН СТРАНИЦЫ */
+.bg-media{ position:fixed; inset:0; overflow:hidden; background:var(--bg); z-index:0; }
+.bg-media__asset{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.bg-placeholder{
+    background:
+    radial-gradient(60% 50% at 30% 20%, rgba(111,227,255,.08), transparent 60%),
+    radial-gradient(50% 40% at 80% 85%, rgba(255,59,48,.06), transparent 60%),
+    repeating-linear-gradient(115deg, #0e0f11 0 2px, #0b0c0e 2px 4px);
+    background-size: cover, cover, 6px 6px;
+}
+.scrim{ position:fixed; inset:0; background:linear-gradient(180deg, rgba(11,12,14,.5) 0%, rgba(11,12,14,.85) 100%); z-index:1; }
+
+.back-link{
+    position:fixed; z-index:3; top:3vh; left:4vw;
+    text-decoration:none; color:var(--text-muted);
+    font-family:var(--font-label); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase;
+    transition:color .3s;
+}
+.back-link:hover{ color:var(--accent); }
+
+.page-head{ position:relative; z-index:2; text-align:center; padding:1vh 6vw 2vh; }
+
+.eyebrow{
+    font-family:var(--font-label); font-size:.78rem; letter-spacing:.35em;
+    text-transform:uppercase; color:var(--text-muted);
+}
+.page-title{
+    font-family: var(--font-nfs); font-style:italic; letter-spacing:-.02em;
+    font-size:clamp(3rem, 8vw, 6rem);
+    background:linear-gradient(180deg,#f6f7f8 0%,#c3c8cd 26%,#7d8288 46%,#f1f3f4 52%,#9aa0a6 68%,#4b4f54 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* ===== сам прокручивающийся список ===== */
+.bl-wrap{
+    position:relative; z-index:1;
+    height:80vh; max-width:940px; margin:0 auto;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+    .bl-list{
+    height:100%; overflow-y:scroll;
+    scroll-snap-type:y mandatory;
+    scrollbar-width:none;
+    padding:2vh 0 30vh;
+    }
+.bl-list::-webkit-scrollbar{ display:none; }
+
+    .bl-item{
+    scroll-snap-align:center;
+    display:flex; align-items:center; justify-content:center; gap:1rem;
+    padding:.9rem 1.2rem;
+    text-decoration:none; color:var(--text);
+    opacity:.4; transform:scale(.92);
+    transition:opacity .25s var(--ease), transform .25s var(--ease);
+    }
+
+.bl-item.is-active{ opacity:1; transform:scale(1); }
+.bl-item:hover{
+    opacity:1;
+    transform:scale(1.06);
+}
+
+.bl-rank{
+    font-family:var(--font-display); font-style:italic; font-size:1.6rem;
+    color:var(--accent-warm); width:2.4ch; flex-shrink:0; text-align:right;
+}
+.bl-thumb{
+    width:64px; height:44px; flex-shrink:0; border-radius:6px; overflow:hidden;
+    background:#1a1b1e; border:1px solid rgba(236,237,240,.12);
+}
+.bl-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.bl-name{ font-family:var(--font-label); font-weight:600; letter-spacing:.02em; font-size:2rem; }
+.bl-sub{ font-size:.75rem; color:var(--text-muted); }
+
+.bl-hint{
+    position:relative; z-index:2; text-align:center;
+    font-family:var(--font-label); font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--text-muted); margin-top:5.5vh;
+    opacity:0; transition:opacity .6s var(--ease);
+}
+.bl-hint.show{ opacity:1; }
+
+    </style>
+    </head>
+    <body>
+
+    <!-- ФОН: замените на свою гифку -->
+    <div class="bg-media bg-placeholder">
+        
+        <!-- <img class="bg-media__asset" src="assets/гараж.jpg" alt=""> -->
+
+    </div>
+    <div class="scrim"></div>
+
+    <a href="prod-site-mockup_1.html" class="back-link">← Назад</a>
+
+    <div class="page-head">
+        <!-- <p class="eyebrow">Чёрный список</p> -->
+        <h1 class="page-title">BLACKLIST</h1>
+    </div>
+
+    <div class="bl-wrap">
+        <div class="bl-list" id="bl-list">
+
+        <!-- ============ ОДИН ПУНКТ СПИСКА ============
+            Скопируйте весь блок <a class="bl-item">...</a> под каждого нового участника.
+            Меняете: data-rank (номер), id=... в ссылке (уникальный для машины),
+            картинку в .bl-thumb, имя и название машины.
+            Порядок блоков в HTML = порядок в списке (сверху вниз). -->
+
+        <a class="bl-item" href="LFA-detail.html" data-rank="1">
+            <span class="bl-rank">03</span>
+            <span class="bl-thumb">
+            <img src="assets/LFA/LFAprof.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">Lexus LFA</span>
+            <span class="bl-sub">unknow</span>
+            </span>
+        </a>
+
+        <a class="bl-item" href="M3-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/e9x/e91p.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">BMW M3 e9X</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+        <a class="bl-item" href="911_966-detail.html?id=14" data-rank="14">
+            <span class="bl-rank">02</span>
+            <span class="bl-thumb">
+            <img src="assets/996/911side.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">Porsche 911 (966)</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+        <!-- ... сюда вставляете остальных участников (13, 12, 11 ... 2) тем же способом ... -->
+
+        <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+        <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+        
+
+
+                <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+
+                <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+
+
+                <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+                <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+
+                <a class="bl-item" href="unknow-detail.html?id=1" data-rank="1">
+            <span class="bl-rank">01</span>
+            <span class="bl-thumb">
+            <!-- КАРТИНКА: миниатюра машины №15 -->
+            <img src="assets/unknow/.jpg" alt="">
+            </span>
+            <span>
+            <span class="bl-name" style="display:block;">unknown</span>
+            <span class="bl-sub">unknown</span>
+            </span>
+        </a>
+
+
+        </div>
+    </div>
+
+    <p class="bl-hint" id="bl-hint">Листайте, чтобы выбрать соперника</p>
+
+    <script>
+    const list  = document.getElementById('bl-list');
+    const hint  = document.getElementById('bl-hint');
+
+    window.addEventListener('load', () => {
+        hint.classList.add('show');
+    });
+</script>
+</body>
+</html>
